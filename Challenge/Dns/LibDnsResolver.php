@@ -16,6 +16,7 @@ use LibDNS\Decoder\Decoder;
 use LibDNS\Decoder\DecoderFactory;
 use LibDNS\Encoder\Encoder;
 use LibDNS\Encoder\EncoderFactory;
+use LibDNS\Messages\Message;
 use LibDNS\Messages\MessageFactory;
 use LibDNS\Messages\MessageTypes;
 use LibDNS\Records\QuestionFactory;
@@ -97,7 +98,7 @@ class LibDnsResolver implements DnsResolverInterface
             try {
                 $response = $this->request($domain, ResourceTypes::TXT, $ipNameServer[0]);
             } catch (\Exception $e) {
-                throw new AcmeDnsResolutionException(sprintf('Unable to find domain %s on nameserver %s', $domain, $nameServer));
+                throw new AcmeDnsResolutionException(sprintf('Unable to find domain %s on nameserver %s', $domain, $nameServer), $ex);
             }
             $entries = [];
             foreach ($response->getAnswerRecords() as $record) {
@@ -171,6 +172,7 @@ class LibDnsResolver implements DnsResolverInterface
         $question->setName($domain);
 
         // Create request message
+	    /** @var Message $request */
         $request = $this->messageFactory->create(MessageTypes::QUERY);
         $request->getQuestionRecords()->add($question);
         $request->isRecursionDesired(true);
